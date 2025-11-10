@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.example.entity.Record;
 import project.example.entity.RecordStatus;
+import project.example.entity.dto.RecordsContainerDto;
 import project.example.service.RecordService;
 
 import java.util.List;
@@ -22,13 +23,11 @@ public class CommonController {
     }
 
     @RequestMapping("/home")
-    public String getMainPage (Model model) {
-        List<Record> records = recordService.findAllRecord();
-        int numberDoneRecords = (int) records.stream().filter(record -> record.getRecordStatus() == RecordStatus.DONE).count();
-        int numberActiveRecords = (int) records.stream().filter(record -> record.getRecordStatus() == RecordStatus.ACTIVE).count();
-        model.addAttribute("numberDoneRecords", numberDoneRecords);
-        model.addAttribute("numberActiveRecords", numberActiveRecords);
-        model.addAttribute("records", records);
+    public String getMainPage (Model model, @RequestParam(name = "filter",required = false) String filterMode) {
+        RecordsContainerDto containerDto = recordService.findAllRecord(filterMode);
+        model.addAttribute("numberDoneRecords", containerDto.getNumberDoneRecords());
+        model.addAttribute("numberActiveRecords", containerDto.getNumberActiveRecords());
+        model.addAttribute("records", containerDto.getRecords());
         return "main-page";
     }
 
