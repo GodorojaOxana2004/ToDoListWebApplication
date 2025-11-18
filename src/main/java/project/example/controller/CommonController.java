@@ -24,7 +24,7 @@ public class CommonController {
 
     @RequestMapping("/home")
     public String getMainPage (Model model, @RequestParam(name = "filter",required = false) String filterMode) {
-        RecordsContainerDto containerDto = recordService.findAllRecord(filterMode);
+        RecordsContainerDto containerDto = recordService.findAllRecords(filterMode);
         model.addAttribute("numberDoneRecords", containerDto.getNumberDoneRecords());
         model.addAttribute("numberActiveRecords", containerDto.getNumberActiveRecords());
         model.addAttribute("records", containerDto.getRecords());
@@ -51,7 +51,7 @@ public class CommonController {
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public String taskDelete(@RequestParam int id) {
-        recordService.DeleteRecord(id);
+        recordService.deleteRecord(id);
         return "redirect:/home";
     }
 

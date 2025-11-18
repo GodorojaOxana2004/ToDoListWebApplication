@@ -16,41 +16,44 @@ public class RecordService {
     private final RecordDao recordDao;
 
     @Autowired
-    public RecordService (RecordDao recordDao) {
+    public RecordService(RecordDao recordDao) {
         this.recordDao = recordDao;
     }
 
-    public RecordsContainerDto findAllRecord(String filterMode) {
+    public RecordsContainerDto findAllRecords(String filterMode) {
+        List<Record> records = recordDao.findAllRecords();
+        int numberOfDoneRecords = (int) records.stream().filter(record -> record.getStatus() == RecordStatus.DONE).count();
+        int numberOfActiveRecords = (int) records.stream().filter(record -> record.getStatus() == RecordStatus.ACTIVE).count();
 
-       List<Record> records = recordDao.findAllRecords();
-       int numberDoneRecords = (int) records.stream().filter(record -> record.getRecordStatus() == RecordStatus.DONE).count();
-        int numberActiveRecords = (int) records.stream().filter(record -> record.getRecordStatus() == RecordStatus.ACTIVE).count();
-       if (filterMode == null || filterMode.isBlank()){
-           return new RecordsContainerDto(records,numberDoneRecords,numberActiveRecords);
-       }
-
-       String inUpperModeFilter = filterMode.toUpperCase();
-        List<String> allowedFilterMode = Arrays.stream(RecordStatus.values()).map(Enum::name).toList();
-       if(allowedFilterMode.contains(inUpperModeFilter)){
-        List<Record> filteredRecords =  records.stream().filter(record -> record.getRecordStatus() == RecordStatus.valueOf(inUpperModeFilter)).toList();
-       return new RecordsContainerDto(filteredRecords,numberDoneRecords,numberActiveRecords);
-       }
-        return new RecordsContainerDto(records,numberDoneRecords,numberActiveRecords);
-
-    }
-
-    public void saveRecord (String taskDescription) {
-        if (taskDescription != null && !taskDescription.isBlank()) {
-            recordDao.saveRecord(new Record(taskDescription));
+        if (filterMode == null || filterMode.isBlank()) {
+            return new RecordsContainerDto(records, numberOfDoneRecords, numberOfActiveRecords);
         }
 
+        String filterModeInUpperCase = filterMode.toUpperCase();
+        List<String> allowedFilterModes = Arrays.stream(RecordStatus.values())
+                .map(Enum::name)
+                .toList();
+        if (allowedFilterModes.contains(filterModeInUpperCase)) {
+            List<Record> filteredRecords = records.stream()
+                    .filter(record -> record.getStatus() == RecordStatus.valueOf(filterModeInUpperCase))
+                    .collect(Collectors.toList());
+            return new RecordsContainerDto(filteredRecords, numberOfDoneRecords, numberOfActiveRecords);
+        } else {
+            return new RecordsContainerDto(records, numberOfDoneRecords, numberOfActiveRecords);
+        }
     }
 
-    public void updateRecordStatus(int id, RecordStatus recordStatus){
-        recordDao.updateRecordStatus(id,recordStatus);
+    public void saveRecord(String title) {
+        if (title != null && !title.isBlank()) {
+            recordDao.saveRecord(new Record(title));
+        }
     }
 
-    public void DeleteRecord(int id) {
-        recordDao.DeleteRecord(id);
+    public void updateRecordStatus(int id, RecordStatus newStatus) {
+        recordDao.updateRecordStatus(id, newStatus);
+    }
+
+    public void deleteRecord(int id) {
+        recordDao.deleteRecord(id);
     }
 }

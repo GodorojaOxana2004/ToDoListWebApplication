@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>ToDo List</title>
-    <link href="/resources/css/main-page.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/resources/css/main-page.css" rel="stylesheet">
 </head>
 <body>
 <div class="main-wrapper">
@@ -36,18 +36,20 @@
                     <c:forEach items="${records}" var="record">
                         <div class="item">
                             <div class="item-text">
-                                <h3 class="${record.recordStatus == 'DONE' ? 'btn-done-done' : ''}">${record.title}</h3>
+                                <h3 class="${record.status == 'DONE' ? 'btn-done-done' : ''}">${record.title}</h3>
                             </div>
 
                             <div class="controls">
-                                <c:if test="${record.recordStatus == 'ACTIVE'}">
+                                <c:if test="${record.status== 'ACTIVE'}">
                                     <form action="/markDone" method="post">
+                                        <input type="hidden" name="id" value="${record.id}" />
                                         <button type="submit" class="btn-done" name="MarksDone" title="MarksDone"
                                                 value="${record.id}">✓
                                         </button>
                                     </form>
                                 </c:if>
                                 <form action="/delete" method="post">
+                                    <input type="hidden" name="id" value="${record.id}" />
                                     <button type="submit" class="btn-delete" name="DeleteTask" title="Delete Task"
                                             value="${record.id}">✕
                                     </button>
